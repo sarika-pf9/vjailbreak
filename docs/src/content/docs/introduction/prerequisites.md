@@ -76,7 +76,7 @@ Please refer the following table for the required ports:
 The vJailbreak VM and any helper nodes must be able to resolve and connect to the following:
 
 - **vCenter, ESXi, and OpenStack API endpoints** — required for API communication.
-- **Cloud-init certificate endpoints**:
+- **Cloud-init certificate endpoints**
 - **Virtio ISO download source**:
   - [https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso)
 - **Health-check endpoints on migrated guest VMs** — over user-defined HTTP/HTTPS ports.
