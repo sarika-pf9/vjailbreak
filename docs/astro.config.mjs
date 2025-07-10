@@ -61,6 +61,7 @@ export default defineConfig({
 						{ label: 'Architecture', slug: 'architecture/architecture-overview' },
 						{ label: 'vJailbreak VM', slug: 'architecture/vjailbreak-vm' },
 						{ label: 'Components', slug: 'architecture/components' },
+						{ label: 'Scalability Analysis', slug: 'architecture/scalability-analysis' },
 					],
 				},
 				
