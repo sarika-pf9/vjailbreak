@@ -34,7 +34,7 @@ EOF
 for file in $CRD_BASES/*.yaml; do
   echo "Processing file: $file"
   if [ ! -f "$file" ]; then
-    echo "Skipping $file (not found)"
+    echo "⚠️  Skipping $file (not found)"
     continue
   fi
   PLURAL=$(/usr/local/bin/yq '.spec.names.plural' "$file") || { echo "Failed to process $file"; exit 1; }
@@ -93,12 +93,12 @@ for file in $CRD_BASES/*.yaml; do
   SCHEMA=$(/usr/local/bin/yq -o=json '.spec.versions[0].schema.openAPIV3Schema' "$file")
 
   if [ -z "$SCHEMA" ] || [ "$SCHEMA" == "null" ]; then
-    echo "Skipping $file (no schema)"
+    echo "⚠️  Skipping $file (no schema)"
     continue
   fi
 
-  echo "Adding schema: $NAME"
-  echo "$NAME:" >> "$OUTPUT_OPENAPI"
+  echo "  📦 Adding schema: $NAME"
+  echo "    $NAME:" >> "$OUTPUT_OPENAPI"
   echo "$SCHEMA" | /usr/local/bin/yq -P | sed 's/^/      /' >> "$OUTPUT_OPENAPI"
 done
 
