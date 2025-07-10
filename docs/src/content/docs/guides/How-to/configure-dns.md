@@ -1,9 +1,9 @@
 ---
-title: How to Finalize the vJailbreak VM Setup
+title: Configure DNS
 description: Configuring Network for Controller Initialization
 ---
 
-This is a mandatory, one-time configuration process that must be performed after deploying the vJailbreak VM for the first time.
+This guide outlines the steps required to configure DNS resolution for the vJailbreak environment when connecting to an OpenStack cloud. In certain on-prem or isolated network setups, the vJailbreak VM may be unable to resolve OpenStack API endpoints such as pcd.pf9.io. To ensure proper authentication and API communication during migration, these hostnames must be manually mapped to their corresponding IP addresses in the VM's /etc/hosts file.
 
 ## Prerequisites
 
@@ -11,8 +11,6 @@ Before you begin, ensure you have:
 * A successfully deployed vJailbreak VM using the qcow2 image.
 * SSH access to the newly created vJailbreak VM.
 * The IP addresses and corresponding hostnames for your OpenStack environment's endpoints.
-* `kubectl` access configured to manage the cluster where vJailbreak is running.
-
 
 ## Configuration Steps
 
