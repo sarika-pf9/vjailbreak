@@ -3,7 +3,7 @@ title: Configure DNS
 description: Configuring Network for Controller Initialization
 ---
 
-This guide outlines the steps required to configure DNS resolution for the vJailbreak environment when connecting to an OpenStack cloud. In certain on-prem or isolated network setups, the vJailbreak VM may be unable to resolve OpenStack API endpoints such as pcd.pf9.io. To ensure proper authentication and API communication during migration, these hostnames must be manually mapped to their corresponding IP addresses in the VM's /etc/hosts file.
+This guide outlines the steps required to configure DNS resolution for the vJailbreak environment when connecting to an OpenStack cloud. In certain on-prem or isolated network setups, the vJailbreak VM may be unable to resolve OpenStack API endpoints. To ensure proper authentication and API communication during migration, these hostnames must be manually mapped to their corresponding IP addresses in the VM's /etc/hosts file.
 
 ## Prerequisites
 
