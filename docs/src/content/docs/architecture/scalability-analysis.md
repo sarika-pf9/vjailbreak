@@ -133,10 +133,10 @@ Assuming that in an ideal scenario all system components scale linearly (infrast
 > **Important Assumption:** The VMs in this analysis have no active workloads running in them, which results in smaller change block data copy requirements and consequently shorter migration times. Production VMs with active workloads would likely take longer to migrate.
 
 ### For CentOS VMs
-- Total VMs migrated per hour = 64.09 × 4 = 256.36 VMs/hour
+- Total VMs migrated per hour = 64.09 (Vms per hour for 6 concurrent migrations) × 4 (agent nodes) = 256.36 VMs/hour
 
 ### For Windows VMs
-- Total VMs migrated per hour = 24.97 × 4 = 99.88 VMs/hour
+- Total VMs migrated per hour = 24.97 (Vms per hour for 6 concurrent migrations) × 4 (agent nodes) = 99.88 VMs/hour
 
 The Windows VMs are significantly larger than the CentOS VMs, with 4× the CPU cores and 4× the memory. Despite this:
 
