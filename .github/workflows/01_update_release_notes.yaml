@@ -78,16 +78,25 @@ jobs:
               return 0
             fi
 
-            # --- RELIABLE LAST_TAG LOGIC ---
-            # Find the line immediately before the current tag in the sorted list
-            LAST_TAG=$(echo "$ALL_TAGS_SORTED" | grep -B1 -x "$RELEASE_TAG" | head -n1 || echo "")
-            
-            if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
-              echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx 2>/dev/null || true
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro 2>/dev/null || true
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx 2>/dev/null || true
+          ALL_TAGS_SORTED=$(git tag --sort=version:refname)
+          # Find the line immediately before the current tag in the sorted list.
+          LAST_TAG=$(echo "$ALL_TAGS_SORTED" | grep -B 1 -x "$RELEASE_TAG" | head -n 1)
+          
+          # Update version references in documentation files
+          if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
+            echo "Found previous version: $LAST_TAG. Updating version numbers in docs..."
+            if [ -f "docs/src/content/docs/introduction/getting_started.mdx" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx
             fi
+            if [ -f "docs/src/components/githubRelease.astro" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro
+            fi
+            if [ -f "docs/src/content/docs/index.mdx" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx
+            fi
+          else
+            echo "No valid previous version found. Skipping version number replacement."
+          fi
 
             FILE_NAME="docs/src/content/docs/release_docs/$RELEASE_TAG.md"
             mkdir -p "$(dirname "$FILE_NAME")"
