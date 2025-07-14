@@ -568,3 +568,10 @@ description: Archived Release Notes for vJailbreak
 ## v0.2.4
 
 **Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.3...v0.2.4
+## v0.2.5
+
+### What's Changed
+* Update generate_all_openapi.sh by @sarika-p9 in https://github.com/sarika-p9/vjailbreak/pull/15
+
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.4...v0.2.5
