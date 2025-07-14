@@ -88,9 +88,9 @@ jobs:
         run: |
           # Get the release tag from the appropriate step
           if [[ "${{ github.event_name }}" == "release" ]]; then
-            RELEASE_TAG="${{ steps.set_release_tag.outputs.RELEASE_TAG }}"
+            RELEASE_TAG="${{ github.event.release.tag_name }}"
           else
-            RELEASE_TAG="${{ steps.set_workflow_release_tag.outputs.RELEASE_TAG }}"
+            RELEASE_TAG="${{ github.event.inputs.release_tag }}"
           fi
           
           FILE_NAME="docs/src/content/docs/release_docs/$RELEASE_TAG.md"
@@ -99,34 +99,37 @@ jobs:
 
           echo "Release Notes:\n$RELEASE_NOTES"
 
-          # Check if RELEASE_NOTES is empty
           if [ -z "$RELEASE_NOTES" ]; then
             echo "No release notes found for $RELEASE_TAG. Skipping file update."
             echo "SKIP_UPDATE=true" >> $GITHUB_OUTPUT
-            exit 0  # Exit gracefully without failing the action
+            exit 0
           fi
           
-          # Fetch all tags to ensure we can find the previous one
-          git fetch origin --prune --tags
+          git fetch --tags --prune
 
-          # CORRECTED: This now gets the second-to-last tag, which is the correct "previous" version.
-          LAST_TAG=$(git tag --sort=version:refname | tail -n 2 | head -n 1)
-
+          # CORRECTED: Using the more robust method to find the tag before the current one.
+          LAST_TAG=$(git describe --tags --abbrev=0 --match "v*" "$RELEASE_TAG^" 2>/dev/null || echo "")
+          
           if [[ -z "$LAST_TAG" ]]; then
             echo "No previous release tag found! Using the current tag as a placeholder."
-            LAST_TAG=$RELEASE_TAG
+            # Find the second-to-last tag as a fallback for the very first run
+            LAST_TAG=$(git tag --sort=version:refname | tail -n 2 | head -n 1)
           fi
           
           # Update version references in documentation files
-          echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
-          if [ -f "docs/src/content/docs/introduction/getting_started.mdx" ]; then
-            sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx
-          fi
-          if [ -f "docs/src/components/githubRelease.astro" ]; then
-            sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro
-          fi
-          if [ -f "docs/src/content/docs/index.mdx" ]; then
-            sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx
+          if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
+            echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
+            if [ -f "docs/src/content/docs/introduction/getting_started.mdx" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx
+            fi
+            if [ -f "docs/src/components/githubRelease.astro" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro
+            fi
+            if [ -f "docs/src/content/docs/index.mdx" ]; then
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx
+            fi
+          else
+            echo "No version replacement needed or previous tag is same as current."
           fi
 
           # Create directory if it doesn't exist
@@ -138,7 +141,6 @@ jobs:
           echo "description: Release Notes for $RELEASE_TAG for vJailbreak" >> "$FILE_NAME"
           echo "---" >> "$FILE_NAME"
           echo "" >> "$FILE_NAME"
-          # Append the new release notes to the file
           echo "$RELEASE_NOTES" >> "$FILE_NAME"
 
           echo "File updated: $FILE_NAME"
@@ -208,20 +210,24 @@ jobs:
             RELEASE_TAG="${{ steps.set_workflow_release_tag.outputs.RELEASE_TAG }}"
           fi
 
-          # Create a new branch
-          NEW_BRANCH="update-release-notes-$RELEASE_TAG"
-
+          # Create a new, UNIQUE branch name with a timestamp
+          TIMESTAMP=$(date +%s)
+          NEW_BRANCH="update-release-notes-$RELEASE_TAG-$TIMESTAMP"
           git checkout -b $NEW_BRANCH
 
           # Add and commit changes
           git add docs/src/content/docs/*
-          git commit -m "Update release notes for $RELEASE_TAG"
+          # Check if there are any changes to commit before proceeding
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: Update release notes for $RELEASE_TAG"
 
-          # Push the new branch
-          git push origin $NEW_BRANCH
+            # Push the new unique branch
+            git push origin $NEW_BRANCH
 
-          # Create a pull request
-          gh pr create --base gh-pages --head $NEW_BRANCH --title "Update release notes for $RELEASE_TAG" --body "Automatically generated PR to update release notes"
+            # Create a pull request
+            gh pr create --base gh-pages --head $NEW_BRANCH --title "docs: Update release notes for $RELEASE_TAG" --body "Automatically generated PR to update release notes."
+          else
+            echo "No changes detected to create a pull request."
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
