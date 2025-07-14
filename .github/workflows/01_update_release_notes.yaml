@@ -71,8 +71,6 @@ jobs:
           # Extract version from branch name (e.g., release-v1.2.3 -> v1.2.3)
           RELEASE_TAG="${{github.event.inputs.release_tag}}"
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest release info
         id: latest_release
