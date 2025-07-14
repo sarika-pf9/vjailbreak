@@ -178,3 +178,127 @@ description: Archived Release Notes for vJailbreak
 
 
 **Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.9...v0.1.10
+## v0.1.7
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.6...v0.1.7
+## v0.1.8
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.7...v0.1.8
+## v0.1.9
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.8...v0.1.9
+## v0.1.10
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.9...v0.1.10
+## v0.1.11
+
+### What's Changed
+* added swagger ui for v0.1.9 and v0.1.10 by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/439
+* counter output for incremental copy by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/451
+* automated swagger ui at every push by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/450
+* Migration stuck in Pending on UI by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/459
+* Wait for volume attachements also to clear out. by @spai-p9 in https://github.com/platform9/vjailbreak/pull/461
+* v2v-helper: Add check if subnet exists to avoid panic.  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/460
+* enable openstack re-auth by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/464
+* use flavor id instead of name in label by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/465
+
+
+**Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.10...v0.1.11
+## v0.1.12
+
+### What's Changed
+* save migration debug logs at hostPath '/var/log/pf9' ( release ) by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/479
+* Add ons in v2v-helper for post-migration actions by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/490
+* Updated documentation for all external connectivity required for vjailbreak by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/467
+* Sync migration logs from worker to master ( release ) by @spai-p9 in https://github.com/platform9/vjailbreak/pull/494
+* User should be able to delete migration when in pending or any stage by @spai-p9 in https://github.com/platform9/vjailbreak/pull/511
+* added the admincutover option to the migration strategy by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/514
+* disabled migration form submission on enter key when text inputs are … by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/515
+* added insecure option to the vmware creds form by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/516
+* Add check from nova side also for volume dettach  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/480
+* Document: Add cbt privilege and flavor selection logic in Doc.  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/502
+* Increase timeout for vm status to become active by @spai-p9 in https://github.com/platform9/vjailbreak/pull/525
+* create delete update vmwaremachines by @spai-p9 in https://github.com/platform9/vjailbreak/pull/523
+* fix build issue.  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/526
+
+
+**Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.11...v0.1.12
+## v0.1.13
+
+### What’s Changed
+* vPwned: Rolling Conversion (release) by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/546
+* uncomment build-vpwned action by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/552
+* added the functionality to validate and assign/edit ips to/of the vms for rolling conversion by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/567
+* added the target cluster selections for migrations by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/573
+* convert PCD Cluster name to k8s compatible by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/576
+* fix issues when VM is attached to same network twice by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/579
+* Release v0.1.13 (release) by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/581
+* Add proxy for vjailbreak  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/562
+* add/update/edit  os and flavors in vms list in rolling conversion by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/586
+* Add alpine docker image with rsync,coreutils in quay  by @spai-p9 in https://github.com/platform9/vjailbreak/pull/590
+* DOC: Add doc for virtio drivers injection by the user by @spai-p9 in https://github.com/platform9/vjailbreak/pull/589
+* change from cloud-ctl to pcdctl by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/599
+* Change the base ubuntu image for vJailbreak qcow by @spai-p9 in https://github.com/platform9/vjailbreak/pull/598
+* Fix scale up by @spai-p9 in https://github.com/platform9/vjailbreak/pull/601
+* Fix cluster name by @spai-p9 in https://github.com/platform9/vjailbreak/pull/602
+* fix openstack volume sizes being smaller than original disk size by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/558
+* improved guestfish logging by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/565
+* Rolling Conversion UI changes by @patil-pratik-87 in https://github.com/platform9/vjailbreak/pull/548
+* fix debug log file for migration re-runs by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/560
+* move os family selection to per VM basis by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/568
+* save disk space on vjb VM by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/571
+* Prebake components by @spai-p9 in https://github.com/platform9/vjailbreak/pull/574
+* Give users option to upload virtio drivers to a path in master and then propogate it down to agents by @spai-p9 in https://github.com/platform9/vjailbreak/pull/575
+* make delete migration-controller-manager pod work by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/572
+
+#### Usability Enhancements and Stability Improvements
+
+- **Rolling Conversion (Beta Availability)**  
+  The Rolling Conversion feature is now available as a beta release.
+
+- **Pre-Packaged vJailbreak Image**  
+  A new vJailbreak image is now available, containing all required components pre-installed. This enhancement eliminates the need for internet access during installation, making it suitable for restricted network environments.
+
+- **Support for Custom VirtIO Drivers**  
+  Users may now upload VirtIO drivers to a designated path. If present, these drivers will be utilized during the migration process. If absent, the system will default to downloading the necessary drivers from the internet, providing flexibility based on deployment conditions. https://github.com/platform9/vjailbreak/blob/main/docs/src/content/docs/guides/virtio_doc.md
+
+- **Resolution of Pod Eviction Due to Disk Pressure**  
+  An issue causing pod eviction under disk pressure conditions has been resolved. This fix improves the reliability and stability of workloads during extended migration operations.
+
+- **Enhanced Debug Logging**  
+  Debug logs have been improved to provide more comprehensive and structured output
+
+
+
+**Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.12...v0.1.13
+## v0.1.14
+
+### What's Changed
+* revert the changes for duplicate networks by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/605
+* accept os_family correctly and override if present by @spai-p9 in https://github.com/platform9/vjailbreak/pull/607
+* support migration without a cluster on pcd by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/608
+* do not fail migrations for snapshot delettions by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/611
+
+
+**Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.13...v0.1.14
+## v0.1.15
+
+### What's Changed
+* fix part-to-dev input by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/614
+* Fix RC file parsing to support special characters in OpenStack credentials. by @sarika-p9 in https://github.com/platform9/vjailbreak/pull/619
+* Made changes to the desination cluster selection by showing cred name… by @patil-pratik-87 n https://github.com/platform9/vjailbreak/pull/634
+* pcdclusters and tenant in UI (release) by @OmkarDeshpande7 in https://github.com/platform9/vjailbreak/pull/633
+* Destination cluster dropdown changes for same id by @patil-pratik-87  in https://github.com/platform9/vjailbreak/pull/636
+
+
+**Full Changelog**: https://github.com/platform9/vjailbreak/compare/v0.1.14...v0.1.15
+## v0.2.0
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.11...v0.2.0
+## v0.2.1
+
+### What's Changed
+* testing release pr by @sarika-p9 in https://github.com/sarika-p9/vjailbreak/pull/2
+
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.0...v0.2.1
