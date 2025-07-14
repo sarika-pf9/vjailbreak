@@ -575,3 +575,44 @@ description: Archived Release Notes for vJailbreak
 
 
 **Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.4...v0.2.5
+## v0.1.7
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.6...v0.1.7
+## v0.1.8
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.7...v0.1.8
+## v0.1.9
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.8...v0.1.9
+## v0.1.10
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.9...v0.1.10
+## v0.2.0
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.1.11...v0.2.0
+## v0.2.1
+
+### What's Changed
+* testing release pr by @sarika-p9 in https://github.com/sarika-p9/vjailbreak/pull/2
+
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.0...v0.2.1
+## v0.2.2
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.1...v0.2.2
+## v0.2.3
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.2...v0.2.3
+## v0.2.4
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.3...v0.2.4
+## v0.2.5
+
+### What's Changed
+* Update generate_all_openapi.sh by @sarika-p9 in https://github.com/sarika-p9/vjailbreak/pull/15
+
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.4...v0.2.5
+## v0.2.6
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.5...v0.2.6
