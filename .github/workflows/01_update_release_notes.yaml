@@ -54,11 +54,15 @@ jobs:
       - name: Process and Generate Release Notes
         id: process_releases
         run: |
+          # Fetch all tags from the repository first
+          git fetch --tags --prune
+          # Get a sorted list of all version tags
+          ALL_TAGS_SORTED=$(git tag --sort=version:refname)
+
           # This function processes a single release tag
           process_release() {
             local RELEASE_TAG=$1
             
-            # For manual runs, skip if the doc file already exists
             if [[ "${{ github.event.inputs.process_all_releases }}" == "true" ]]; then
               if [ -f "docs/src/content/docs/release_docs/$RELEASE_TAG.md" ]; then
                 echo "Documentation already exists for $RELEASE_TAG, skipping."
@@ -74,10 +78,10 @@ jobs:
               return 0
             fi
 
-            # Find the tag immediately before this one
-            LAST_TAG=$(git describe --tags --abbrev=0 --match "v*" "$RELEASE_TAG^" 2>/dev/null || echo "")
+            # --- RELIABLE LAST_TAG LOGIC ---
+            # Find the line immediately before the current tag in the sorted list
+            LAST_TAG=$(echo "$ALL_TAGS_SORTED" | grep -B1 -x "$RELEASE_TAG" | head -n1 || echo "")
             
-            # Update version numbers in docs if a previous tag was found
             if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
               echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
               sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx 2>/dev/null || true
@@ -85,7 +89,6 @@ jobs:
               sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx 2>/dev/null || true
             fi
 
-            # Create the release note .md file
             FILE_NAME="docs/src/content/docs/release_docs/$RELEASE_TAG.md"
             mkdir -p "$(dirname "$FILE_NAME")"
             {
@@ -98,59 +101,48 @@ jobs:
             } > "$FILE_NAME"
             
             echo "Created documentation for $RELEASE_TAG"
-            # Add the processed tag to the output
             PROCESSED_LIST_TEMP+="$RELEASE_TAG "
           }
 
-          # Make the function available to subshells
           export -f process_release
-          # Fetch all tags from the repository
-          git fetch --tags --prune
-          
           PROCESSED_LIST_TEMP=""
 
-          # This is the main logic block
-          # If "process_all_releases" is checked in a manual run...
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.process_all_releases }}" == "true" ]]; then
             echo "Processing all recent missing releases..."
-            # Get all release tags, sort them by version
-            ALL_RELEASES=$(gh release list --limit 50 --json tagName --jq '.[].tagName' | sort -V)
-            
-            # Loop through all releases and process each one
+            ALL_RELEASES=$(gh release list --limit 100 --json tagName --jq '.[].tagName' | sort -V)
             for TAG in $ALL_RELEASES; do
               process_release "$TAG"
             done
-          # If triggered by a new published release...
           elif [[ "${{ github.event_name }}" == "release" ]]; then
             echo "Processing single new release..."
             process_release "${{ github.event.release.tag_name }}"
           fi
           
-          # Set the final output for the next step
           echo "PROCESSED_RELEASES=${PROCESSED_LIST_TEMP}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - name: Archive old release notes
+      - name: Archive and Delete Old Release Notes
         run: |
-          echo "Checking for older release notes..."
+          echo "Checking for older release notes to archive and delete..."
           mapfile -t ALL_VERSIONS < <(find docs/src/content/docs/release_docs -name "v*.md" -printf "%f\n" | sed -e 's/^v//' -e 's/\.md$//' | sort -V)
           mapfile -t TOP5 < <(printf '%s\n' "${ALL_VERSIONS[@]}" | tail -n 5)
 
           declare -A is_top5
           for v in "${TOP5[@]}"; do is_top5["$v"]=1; done
 
-          echo "Top 5 versions:"
+          echo "Keeping Top 5 versions:"
           printf 'v%s\n' "${TOP5[@]}"
 
           for v in "${ALL_VERSIONS[@]}"; do
             if [[ -z "${is_top5[$v]}" ]]; then
               FILE_TO_ARCHIVE="docs/src/content/docs/release_docs/v${v}.md"
-              echo "Archiving $FILE_TO_ARCHIVE"
-              # Your awk command here...
+              echo "Archiving and deleting $FILE_TO_ARCHIVE"
+              # Copy the content to the archive file
               awk 'BEGIN { in_yaml=0 } /^---$/ { in_yaml = !in_yaml; next } in_yaml { if ($1 == "title:") { sub(/^title:[[:space:]]*v/, "## v"); print; }; next; } { sub(/^##/, "###"); print }' "$FILE_TO_ARCHIVE" >> docs/src/content/docs/archives/release_notes.md
-              # rm "$FILE_TO_ARCHIVE" # Optional: remove the file after archiving
+              # --- DELETE THE FILE ---
+              rm "$FILE_TO_ARCHIVE"
             fi
           done
         env:
