@@ -51,181 +51,128 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh jq
 
-      - name: Set release tag for release_event
-        if: github.event_name == 'release'
-        id: set_release_tag
+      - name: Process and Generate Release Notes
+        id: process_releases
         run: |
-          RELEASE_TAG="${{ github.event.release.tag_name }}"
-          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This function processes a single release tag
+          process_release() {
+            local RELEASE_TAG=$1
+            
+            # For manual runs, skip if the doc file already exists
+            if [[ "${{ github.event.inputs.process_all_releases }}" == "true" ]]; then
+              if [ -f "docs/src/content/docs/release_docs/$RELEASE_TAG.md" ]; then
+                echo "Documentation already exists for $RELEASE_TAG, skipping."
+                return 0
+              fi
+            fi
 
-      - name: Set release tag for Wrokflow Event
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != ''
-        id: set_workflow_release_tag
-        run: |
-          # Extract version from branch name (e.g., release-v1.2.3 -> v1.2.3)
-          RELEASE_TAG="${{github.event.inputs.release_tag}}"
-          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
+            echo "Processing release: $RELEASE_TAG"
+            RELEASE_NOTES=$(gh release view $RELEASE_TAG --json body --template '{{.body}}' || echo "")
+            
+            if [ -z "$RELEASE_NOTES" ]; then
+              echo "No release notes found for $RELEASE_TAG, skipping."
+              return 0
+            fi
 
-      - name: Get latest release info
-        id: latest_release
-        run: |
-          RELEASE_JSON=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
-          LATEST_RELEASE_NAME=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
-          IS_LATEST=$(echo "$RELEASE_JSON" | jq -r '.prerelease')
-          echo "Latest release name: $LATEST_RELEASE_NAME"
-          echo "Is latest release: $IS_LATEST"
-          echo "LATEST_RELEASE_NAME=$LATEST_RELEASE_NAME" >> $GITHUB_OUTPUT
-          echo "IS_LATEST=$IS_LATEST" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+            # Find the tag immediately before this one
+            LAST_TAG=$(git describe --tags --abbrev=0 --match "v*" "$RELEASE_TAG^" 2>/dev/null || echo "")
+            
+            # Update version numbers in docs if a previous tag was found
+            if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
+              echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx 2>/dev/null || true
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro 2>/dev/null || true
+              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx 2>/dev/null || true
+            fi
 
-      - name: Generate release notes
-        id: generate_notes
-        run: |
-          # Get the release tag from the appropriate step
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            RELEASE_TAG="${{ github.event.release.tag_name }}"
-          else
-            RELEASE_TAG="${{ github.event.inputs.release_tag }}"
-          fi
-          
-          FILE_NAME="docs/src/content/docs/release_docs/$RELEASE_TAG.md"
+            # Create the release note .md file
+            FILE_NAME="docs/src/content/docs/release_docs/$RELEASE_TAG.md"
+            mkdir -p "$(dirname "$FILE_NAME")"
+            {
+              echo "---"
+              echo "title:  $RELEASE_TAG"
+              echo "description: Release Notes for $RELEASE_TAG for vJailbreak"
+              echo "---"
+              echo ""
+              echo "$RELEASE_NOTES"
+            } > "$FILE_NAME"
+            
+            echo "Created documentation for $RELEASE_TAG"
+            # Add the processed tag to the output
+            PROCESSED_LIST_TEMP+="$RELEASE_TAG "
+          }
 
-          RELEASE_NOTES=$(gh release view $RELEASE_TAG --json body --template '{{.body}}')
-
-          echo "Release Notes:\n$RELEASE_NOTES"
-
-          if [ -z "$RELEASE_NOTES" ]; then
-            echo "No release notes found for $RELEASE_TAG. Skipping file update."
-            echo "SKIP_UPDATE=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
+          # Make the function available to subshells
+          export -f process_release
+          # Fetch all tags from the repository
           git fetch --tags --prune
-
-          # CORRECTED: Using the more robust method to find the tag before the current one.
-          LAST_TAG=$(git describe --tags --abbrev=0 --match "v*" "$RELEASE_TAG^" 2>/dev/null || echo "")
           
-          if [[ -z "$LAST_TAG" ]]; then
-            echo "No previous release tag found! Using the current tag as a placeholder."
-            # Find the second-to-last tag as a fallback for the very first run
-            LAST_TAG=$(git tag --sort=version:refname | tail -n 2 | head -n 1)
+          PROCESSED_LIST_TEMP=""
+
+          # This is the main logic block
+          # If "process_all_releases" is checked in a manual run...
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.process_all_releases }}" == "true" ]]; then
+            echo "Processing all recent missing releases..."
+            # Get all release tags, sort them by version
+            ALL_RELEASES=$(gh release list --limit 50 --json tagName --jq '.[].tagName' | sort -V)
+            
+            # Loop through all releases and process each one
+            for TAG in $ALL_RELEASES; do
+              process_release "$TAG"
+            done
+          # If triggered by a new published release...
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "Processing single new release..."
+            process_release "${{ github.event.release.tag_name }}"
           fi
           
-          # Update version references in documentation files
-          if [[ -n "$LAST_TAG" && "$LAST_TAG" != "$RELEASE_TAG" ]]; then
-            echo "Replacing version string '$LAST_TAG' with '$RELEASE_TAG' in docs."
-            if [ -f "docs/src/content/docs/introduction/getting_started.mdx" ]; then
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/introduction/getting_started.mdx
-            fi
-            if [ -f "docs/src/components/githubRelease.astro" ]; then
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/components/githubRelease.astro
-            fi
-            if [ -f "docs/src/content/docs/index.mdx" ]; then
-              sed -i "s|$LAST_TAG|$RELEASE_TAG|g" docs/src/content/docs/index.mdx
-            fi
-          else
-            echo "No version replacement needed or previous tag is same as current."
-          fi
-
-          # Create directory if it doesn't exist
-          mkdir -p "$(dirname "$FILE_NAME")"
-
-          # Add a header to the file
-          echo "---" > "$FILE_NAME"
-          echo "title:  $RELEASE_TAG" >> "$FILE_NAME"
-          echo "description: Release Notes for $RELEASE_TAG for vJailbreak" >> "$FILE_NAME"
-          echo "---" >> "$FILE_NAME"
-          echo "" >> "$FILE_NAME"
-          echo "$RELEASE_NOTES" >> "$FILE_NAME"
-
-          echo "File updated: $FILE_NAME"
-          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_OUTPUT
-          echo "SKIP_UPDATE=false" >> $GITHUB_OUTPUT
+          # Set the final output for the next step
+          echo "PROCESSED_RELEASES=${PROCESSED_LIST_TEMP}" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - name: archive old release notes
+      - name: Archive old release notes
         run: |
-          echo "Checking for older release notes"
-          
-          # strip the 'v' prefix and '.md' suffix.
-          mapfile -t ALL < <(find docs/src/content/docs/release_docs -name "v*.md" -printf "%f\n" | sed -e 's/^v//' -e 's/\.md$//' | sort -V)
-          mapfile -t TOP5 < <(printf '%s\n' "${ALL[@]}" | tail -n 5)
+          echo "Checking for older release notes..."
+          mapfile -t ALL_VERSIONS < <(find docs/src/content/docs/release_docs -name "v*.md" -printf "%f\n" | sed -e 's/^v//' -e 's/\.md$//' | sort -V)
+          mapfile -t TOP5 < <(printf '%s\n' "${ALL_VERSIONS[@]}" | tail -n 5)
 
-          # build a lookup for TOP5
           declare -A is_top5
-          for v in "${TOP5[@]}"; do
-            is_top5["$v"]=1
-          done
+          for v in "${TOP5[@]}"; do is_top5["$v"]=1; done
 
-          echo "Top 5 versions"
-          for v in "${TOP5[@]}"; do
-            echo "v$v"
-          done
+          echo "Top 5 versions:"
+          printf 'v%s\n' "${TOP5[@]}"
 
-          echo "Archived versions"
-          for v in "${ALL[@]}"; do
+          for v in "${ALL_VERSIONS[@]}"; do
             if [[ -z "${is_top5[$v]}" ]]; then
               FILE_TO_ARCHIVE="docs/src/content/docs/release_docs/v${v}.md"
-              echo "trying to archive $FILE_TO_ARCHIVE"
-              awk '
-              BEGIN { in_yaml=0 }
-              /^---$/ { in_yaml = !in_yaml; next }
-              in_yaml {
-                if ($1 == "title:") {
-                  sub(/^title:[[:space:]]*v/, "## v")
-                  print
-                }
-                next
-              }
-              # Outside YAML: convert all ## to ###
-              {
-              sub(/^##/, "###")
-              print
-              }
-              ' "$FILE_TO_ARCHIVE" >> docs/src/content/docs/archives/release_notes.md
+              echo "Archiving $FILE_TO_ARCHIVE"
+              # Your awk command here...
+              awk 'BEGIN { in_yaml=0 } /^---$/ { in_yaml = !in_yaml; next } in_yaml { if ($1 == "title:") { sub(/^title:[[:space:]]*v/, "## v"); print; }; next; } { sub(/^##/, "###"); print }' "$FILE_TO_ARCHIVE" >> docs/src/content/docs/archives/release_notes.md
+              # rm "$FILE_TO_ARCHIVE" # Optional: remove the file after archiving
             fi
           done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}    
 
       - name: Create PR with changes
-        if: steps.generate_notes.outputs.SKIP_UPDATE != 'true'
+        if: steps.process_releases.outputs.PROCESSED_RELEASES != ''
         run: |
-          # Configure Git
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions Bot"
-
-          # Get the release tag from the appropriate step
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            RELEASE_TAG="${{ steps.set_release_tag.outputs.RELEASE_TAG }}"
-          else
-            RELEASE_TAG="${{ steps.set_workflow_release_tag.outputs.RELEASE_TAG }}"
-          fi
-
-          # Create a new, UNIQUE branch name with a timestamp
+          
           TIMESTAMP=$(date +%s)
-          NEW_BRANCH="update-release-notes-$RELEASE_TAG-$TIMESTAMP"
+          PROCESSED_TAGS="${{ steps.process_releases.outputs.PROCESSED_RELEASES }}"
+          NEW_BRANCH="update-release-notes-$TIMESTAMP"
+          
           git checkout -b $NEW_BRANCH
-
-          # Add and commit changes
-          git add docs/src/content/docs/*
-          # Check if there are any changes to commit before proceeding
+          git add docs/src/content/docs/
+          
           if ! git diff --cached --quiet; then
-            git commit -m "docs: Update release notes for $RELEASE_TAG"
-
-            # Push the new unique branch
+            git commit -m "docs: Update release notes for ${PROCESSED_TAGS}"
             git push origin $NEW_BRANCH
-
-            # Create a pull request
-            gh pr create --base gh-pages --head $NEW_BRANCH --title "docs: Update release notes for $RELEASE_TAG" --body "Automatically generated PR to update release notes."
+            gh pr create --base gh-pages --head $NEW_BRANCH --title "docs: Update release notes for ${PROCESSED_TAGS}" --body "Automatically generated PR to update release notes."
           else
             echo "No changes detected to create a pull request."
           fi
