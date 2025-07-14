@@ -575,3 +575,6 @@ description: Archived Release Notes for vJailbreak
 
 
 **Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.4...v0.2.5
+## v0.2.6
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.2.5...v0.2.6
