@@ -39,9 +39,6 @@ jobs:
       pull-requests: write
       id-token: write
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'release' && github.event.release.published == 'true') ||
-      (github.event_name == 'workflow_dispatch')
 
     steps:
       - name: Checkout code
@@ -55,10 +52,9 @@ jobs:
           sudo apt-get install -y gh jq
 
       - name: Set release tag for release_event
-        if: github.event_name == 'release' && github.event.release.published == 'true'
+        if: github.event_name == 'release'
         id: set_release_tag
         run: |
-          # Extract version from branch name (e.g., release-v1.2.3 -> v1.2.3)
           RELEASE_TAG="${{ github.event.release.tag_name }}"
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
         env:
