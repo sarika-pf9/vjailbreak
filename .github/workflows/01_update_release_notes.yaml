@@ -156,8 +156,9 @@ jobs:
       - name: archive old release notes
         run: |
           echo "Checking for older release notes"
-          # strip leading 'v', sort semantically, pick top-5, then subtract
-          mapfile -t ALL < <(ls docs/src/content/docs/release_docs/v* 2>/dev/null | sed 's/^v//' | sort -V)
+          
+          # strip the 'v' prefix and '.md' suffix.
+          mapfile -t ALL < <(find docs/src/content/docs/release_docs -name "v*.md" -printf "%f\n" | sed -e 's/^v//' -e 's/\.md$//' | sort -V)
           mapfile -t TOP5 < <(printf '%s\n' "${ALL[@]}" | tail -n 5)
 
           # build a lookup for TOP5
@@ -174,31 +175,25 @@ jobs:
           echo "Archived versions"
           for v in "${ALL[@]}"; do
             if [[ -z "${is_top5[$v]}" ]]; then
-              echo "trying to archive v$v"
+              FILE_TO_ARCHIVE="docs/src/content/docs/release_docs/v${v}.md"
+              echo "trying to archive $FILE_TO_ARCHIVE"
               awk '
               BEGIN { in_yaml=0 }
-              # Toggle YAML block
-              /^---$/ {
-              in_yaml = !in_yaml
-              next
-              }
-
-              # While inside YAML block
+              /^---$/ { in_yaml = !in_yaml; next }
               in_yaml {
-              if ($1 == "title:") {
-              sub(/^title:[[:space:]]*v/, "## v")
-              print
+                if ($1 == "title:") {
+                  sub(/^title:[[:space:]]*v/, "## v")
+                  print
+                }
+                next
               }
-              next
-              }
-
               # Outside YAML: convert all ## to ###
               {
               sub(/^##/, "###")
               print
               }
-              ' docs/src/content/docs/release_docs/v$v.md >> docs/src/content/docs/archives/release_notes.md
-            fi 
+              ' "$FILE_TO_ARCHIVE" >> docs/src/content/docs/archives/release_notes.md
+            fi
           done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -235,3 +230,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Delete draft release
+        id: delete_draft_release
+        run: |
+          gh release delete ${{ steps.draft_release.outputs.DRAFT_RELEASE_ID }} -y 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
