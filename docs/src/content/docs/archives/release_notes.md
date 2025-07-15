@@ -600,3 +600,6 @@ description: Archived Release Notes for vJailbreak
 ## v0.3.3
 
 **Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.3.2...v0.3.3
+## v0.3.4
+
+**Full Changelog**: https://github.com/sarika-p9/vjailbreak/compare/v0.3.3...v0.3.4
