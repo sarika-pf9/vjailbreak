@@ -32,9 +32,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: ubuntu-latest
-    if: (github.event.release.published) || (github.event_name == 'workflow_dispatch')
-    
+    runs-on: ubuntu-latest    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
