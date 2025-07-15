@@ -92,6 +92,9 @@ jobs:
             echo ""
             echo "$RELEASE_NOTES"
           } > "$FILE_NAME"
+
+          echo "--- Verifying file creation in directory: ---"
+          ls -l docs/src/content/docs/release_docs/
           
           echo "processed_release=true" >> $GITHUB_OUTPUT
           echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
