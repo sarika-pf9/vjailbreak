@@ -108,7 +108,7 @@ The data indicates that as the number of concurrent VM migrations increases, the
 
 - CPU & Memory Usage:
   Peak cpu usage: 6.94%
-  Peak memory usage: 11%
+  Peak memory usage: 4.85%
 - Time Taken:  
   - VM 1: 13 minutes 25 seconds  
   - VM 2: 14 minutes 52 seconds  
