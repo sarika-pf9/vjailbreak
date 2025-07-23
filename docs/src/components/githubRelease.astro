@@ -96,14 +96,22 @@ const baseURL = Astro.site || '/'; // Fallback to '/' if Astro.site is undefined
       localStorage.setItem('vjailbreakSelectedVersion', select.value);
       select.onchange = (e) => {
         localStorage.setItem('vjailbreakSelectedVersion', e.target.value);
-
         const version = e.target.value;
         const btns = document.querySelectorAll('.version-btn');
+        let found = false;
         btns.forEach(btn => {
           if (btn.textContent === version) {
             btn.click();
+            found = true;
           }
         });
+        if (!found) {
+          const currentURL = astroBaseURL || window.location.origin;
+          const pathPrefix = astroBaseURL ? '/vjailbreak/release_docs/' : '/release_docs/';
+          const nameModified = version.replace(/\./g, '');
+          const releaseDocsURL = `${currentURL}${pathPrefix}${nameModified}/`;
+          window.open(releaseDocsURL, '_blank');
+        }
       };
     }
   });
