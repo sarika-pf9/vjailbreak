@@ -81,8 +81,26 @@ const { versions } = Astro.props;
       button.addEventListener('click', loadApiVersion);
     });
 
+    let defaultIdx = 0;
+    let localStorageVersion = undefined;
+    try {
+      localStorageVersion = localStorage.getItem('vjailbreakSelectedVersion');
+    } catch (e) {}
+    if (localStorageVersion) {
+      buttons.forEach((btn, idx) => {
+        if (btn.textContent === localStorageVersion) {
+          defaultIdx = idx;
+        }
+      });
+    } else if (typeof defaultVersion !== 'undefined') {
+      buttons.forEach((btn, idx) => {
+        if (btn.textContent === defaultVersion) {
+          defaultIdx = idx;
+        }
+      });
+    }
     if (buttons.length > 0) {
-      buttons[0].click();
+      buttons[defaultIdx].click();
     } else if (iframeContainer) {
       iframeContainer.innerHTML = '<p>No API versions found.</p>';
     }
