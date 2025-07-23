@@ -97,9 +97,13 @@ const baseURL = Astro.site || '/'; // Fallback to '/' if Astro.site is undefined
       select.onchange = (e) => {
         localStorage.setItem('vjailbreakSelectedVersion', e.target.value);
 
-        const nameModified = e.target.value.replace(/\./g, '');
-        const releaseDocsURL = `${currentURL}${pathPrefix}${nameModified}/`;
-        window.open(releaseDocsURL, '_blank');
+        const version = e.target.value;
+        const btns = document.querySelectorAll('.version-btn');
+        btns.forEach(btn => {
+          if (btn.textContent === version) {
+            btn.click();
+          }
+        });
       };
     }
   });
