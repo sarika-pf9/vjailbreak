@@ -20,11 +20,8 @@ const { versions } = Astro.props;
     border-radius: 0.25rem;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
-    width: 90px;
+    width: 90px; 
     text-align: center;
-    font-weight: normal;
-    font-size: 1rem;
-    box-sizing: border-box;
   }
   .version-btn:hover {
     background-color: var(--sl-color-gray-6);
@@ -56,9 +53,7 @@ const { versions } = Astro.props;
 
 <div class="version-buttons">
   {versions.map(tag => (
-    <button class="version-btn" data-src={`/vjailbreak/swagger-ui/${tag}/`}>
-      {tag}
-    </button>
+    <button class="version-btn" data-src={`/vjailbreak/swagger-ui/${tag}/`}>{tag}</button>
   ))}
 </div>
 <div class="iframe-container">
