@@ -62,7 +62,7 @@ const baseURL = Astro.site || '/'; // Fallback to '/' if Astro.site is undefined
 
     try {
       console.debug("Fetching releases from GitHub"); // Debug log
-      const response = await fetch('https://api.github.com/repos/platform9/vjailbreak/releases');
+      const response = await fetch('https://api.github.com/repos/sarika-p9/vjailbreak/releases');
       const data = await response.json();
       const releases = data.slice(0, 5);
 
@@ -78,7 +78,7 @@ const baseURL = Astro.site || '/'; // Fallback to '/' if Astro.site is undefined
       populateDropdown([{
         id: 0,
         name: "v0.1.7",
-        html_url: "https://github.com/platform9/vjailbreak/releases/tag/v0.1.7"
+        html_url: "https://github.com/sarika-p9/vjailbreak/releases/tag/v0.1.7"
       }]);
     }
 
