@@ -12,6 +12,7 @@ const { versions } = Astro.props;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+  
   .version-btn {
     padding: 0.5rem 1rem;
     border: 1px solid var(--sl-color-gray-5);
@@ -20,26 +21,30 @@ const { versions } = Astro.props;
     border-radius: 0.25rem;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
-    width: 90px; 
+    width: 90px;
     text-align: center;
+
+    /* 1. Define variables with LIGHT MODE colors as the default */
+    --active-bg: var(--sl-color-accent);
+    --active-color: var(--sl-color-text-invert);
   }
+
+  /* 2. For dark mode, CHANGE the value of our variables */
+  [data-theme='dark'] .version-btn {
+    --active-bg: var(--sl-color-accent-low);
+    --active-color: var(--sl-color-text);
+  }
+
   .version-btn:hover {
     background-color: var(--sl-color-gray-6);
   }
     
-  /* This is the style for LIGHT MODE */
+  /* 3. Apply the variables to the active button */
   .version-btn.active {
-    background-color: var(--sl-color-accent);
-    color: var(--sl-color-text-invert);
-    border-color: var(--sl-color-accent);
+    background-color: var(--active-bg);
+    color: var(--active-color);
+    border-color: var(--active-bg);
     font-weight: bold;
-  }
-
-  /* This rule OVERRIDES the style specifically for DARK MODE */
-  [data-theme='dark'] .version-btn.active {
-    background-color: var(--sl-color-accent-low);
-    color: var(--sl-color-text);
-    border-color: var(--sl-color-accent-low);
   }
 
   .iframe-container {
@@ -51,6 +56,7 @@ const { versions } = Astro.props;
     border-radius: 0.25rem;
     overflow: hidden;
   }
+
   #swagger-iframe {
     position: absolute;
     top: 0;
