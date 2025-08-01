@@ -27,11 +27,19 @@ const { versions } = Astro.props;
     background-color: var(--sl-color-gray-6);
   }
     
+  /* This is the style for LIGHT MODE */
   .version-btn.active {
     background-color: var(--sl-color-accent);
     color: var(--sl-color-text-invert);
     border-color: var(--sl-color-accent);
     font-weight: bold;
+  }
+
+  /* This rule OVERRIDES the style specifically for DARK MODE */
+  [data-theme='dark'] .version-btn.active {
+    background-color: var(--sl-color-accent-low);
+    color: var(--sl-color-text);
+    border-color: var(--sl-color-accent-low);
   }
 
   .iframe-container {
