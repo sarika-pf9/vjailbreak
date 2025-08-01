@@ -27,21 +27,19 @@ const { versions } = Astro.props;
     background-color: var(--sl-color-gray-6);
   }
     
-  .version-btn.active {
+  [data-theme='light'] .version-btn.active {
     background-color: var(--sl-color-accent);
     color: var(--sl-color-text-invert);
     border-color: var(--sl-color-accent);
     font-weight: bold;
   }
 
-  /* --- UPDATE STARTS HERE --- */
-  /* This rule applies your chosen colors in dark mode */
-  [data-theme='dark'] .version-btn.active {
-    background-color: #b3c7ff;
-    color: #17264f;
-    border-color: #b3c7ff;
-  }
-  /* --- UPDATE ENDS HERE --- */
+[data-theme='dark'] .version-btn.active {
+  background-color: #b3c7ff;
+  color: #17264f;
+  border-color: #b3c7ff;
+  font-weight: bold;
+}
 
   .iframe-container {
     position: relative;
