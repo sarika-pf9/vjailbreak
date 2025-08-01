@@ -38,7 +38,12 @@
 /* Override Starlight's default fonts */
 :root {
   --sl-font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  --sl-content-width: 85rem;
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --sl-content-width: 80rem;
+  }
 }
 
 /* Specific element styling */
