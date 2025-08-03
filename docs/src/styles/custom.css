@@ -603,3 +603,40 @@ button[type='submit'] {
 .close-button:hover {
   background: var(--sl-color-gray-5);
 }
+
+
+
+.version-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  background-color: transparent;
+  color: var(--sl-color-text);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  width: 90px;
+  text-align: center;
+  font-weight: normal;
+}
+
+/* Hover state */
+.version-btn:hover {
+  background-color: var(--sl-color-gray-6);
+}
+
+/* DEFAULT/LIGHT MODE Active State */
+.version-btn.active {
+  background-color: var(--sl-color-accent);
+  color: var(--sl-color-text-invert);
+  border-color: var(--sl-color-accent);
+  font-weight: bold;
+}
+
+/* DARK MODE Active State Override */
+[data-theme='dark'] .version-btn.active {
+  background-color: #b3c7ff;
+  color: #17264f;
+  border-color: #b3c7ff;
+  font-weight: bold;
+}
+   
