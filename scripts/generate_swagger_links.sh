@@ -16,5 +16,3 @@ title: "API Reference by Version"
 import ApiReference from '../../../components/ApiReference.astro';
 
 <ApiReference versions={$TAGS_JSON} />
-
-echo "API reference page updated to use ApiReference component in $OUTPUT_FILE"
