@@ -1,17 +1,10 @@
----
-export interface Props {
-  versions: string[];
-}
-const { versions } = Astro.props;
----
-
 <style>
+  /* Your existing styles can remain here */
   .iframe-container {
     position: relative;
     width: 100%;
     min-height: 80vh;
-    aspect-ratio: 4 / 3;
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1px solid #ccc;
     border-radius: 0.25rem;
     overflow: hidden;
   }
@@ -21,61 +14,74 @@ const { versions } = Astro.props;
     left: 0;
     width: 100%;
     height: 100%;
-    min-height: 80vh;
     border: none;
+  }
+  .version-btn.active {
+    font-weight: bold;
+    text-decoration: underline;
   }
 </style>
 
-<div class="version-buttons">
-  {versions.map(tag => (
-    <button class="version-btn" data-src={`/vjailbreak/swagger-ui/${tag}/`}>{tag}</button>
-  ))}
-</div>
-<div class="iframe-container">
-  <iframe id="swagger-iframe" title="Swagger API Reference" loading="lazy"></iframe>
+<div id="api-reference-wrapper">
+  <div class="version-buttons" style="margin-bottom: 1rem;">
+    </div>
+  <div class="iframe-container">
+    <iframe id="swagger-iframe" title="Swagger API Reference" loading="lazy"></iframe>
+  </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const container = document.querySelector('.version-buttons').parentElement;
-    const buttons = container.querySelectorAll('.version-btn');
-    const iframe = container.querySelector('#swagger-iframe');
-    const iframeContainer = container.querySelector('.iframe-container');
+    // 1. Find our component and its elements
+    const wrapper = document.getElementById('api-reference-wrapper');
+    if (!wrapper) return;
+
+    const buttonContainer = wrapper.querySelector('.version-buttons');
+    const iframe = wrapper.querySelector('#swagger-iframe');
+    const iframeContainer = wrapper.querySelector('.iframe-container');
+
+    // 2. Get the versions data from the `data-versions` attribute on the parent
+    const versionsAttr = wrapper.parentElement.getAttribute('data-versions');
+    let versions = [];
+    try {
+      versions = JSON.parse(versionsAttr);
+    } catch (e) {
+      console.error("Failed to parse API versions data", e);
+      iframeContainer.innerHTML = '<p>Error: Could not load API versions.</p>';
+      return;
+    }
+
+    if (!versions || versions.length === 0) {
+      iframeContainer.innerHTML = '<p>No API versions found.</p>';
+      return;
+    }
+
+    // 3. Dynamically create the version buttons
+    versions.forEach(tag => {
+      const button = document.createElement('button');
+      button.className = 'version-btn';
+      button.textContent = tag;
+      button.dataset.src = `/vjailbreak/swagger-ui/${tag}/`;
+      buttonContainer.appendChild(button);
+    });
+
+    // 4. Set up event listeners and default view
+    const buttons = wrapper.querySelectorAll('.version-btn');
 
     function loadApiVersion(event) {
       buttons.forEach(btn => btn.classList.remove('active'));
       const clickedButton = event.currentTarget;
       clickedButton.classList.add('active');
-      const newSrc = clickedButton.getAttribute('data-src');
-      iframe.src = newSrc;
+      iframe.src = clickedButton.dataset.src;
     }
 
     buttons.forEach(button => {
       button.addEventListener('click', loadApiVersion);
     });
 
-    let defaultIdx = 0;
-    let localStorageVersion = undefined;
-    try {
-      localStorageVersion = localStorage.getItem('vjailbreakSelectedVersion');
-    } catch (e) {}
-    if (localStorageVersion) {
-      buttons.forEach((btn, idx) => {
-        if (btn.textContent === localStorageVersion) {
-          defaultIdx = idx;
-        }
-      });
-    } else if (typeof defaultVersion !== 'undefined') {
-      buttons.forEach((btn, idx) => {
-        if (btn.textContent === defaultVersion) {
-          defaultIdx = idx;
-        }
-      });
-    }
+    // Click the first button by default
     if (buttons.length > 0) {
-      buttons[defaultIdx].click();
-    } else if (iframeContainer) {
-      iframeContainer.innerHTML = '<p>No API versions found.</p>';
+      buttons[0].click();
     }
   });
 </script>
