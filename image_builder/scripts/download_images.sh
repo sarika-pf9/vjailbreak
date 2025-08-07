@@ -28,7 +28,7 @@ ui="quay.io/sarika-p9/vjailbreak-ui:$TAG"
 vpwned="quay.io/sarika-p9/vjailbreak-vpwned:$TAG"
 virtiowin="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso"
 # TODO(suhas): Create a seperate repository for alpine image in quay
-alpine="quay.io/sarika-p9/vjailbreak:alpine"
+alpine="quay.io/platform9/vjailbreak:alpine"
 
 # Download and export images
 images=(

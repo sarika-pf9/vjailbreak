@@ -411,7 +411,7 @@ jobs:
 
       - name: Download ubuntu base image
         if: env.release_found == 'true'
-        run: oras pull quay.io/sarika-p9/vjailbreak:ubuntu-base-prebaked
+        run: oras pull quay.io/platform9/vjailbreak:ubuntu-base-prebaked
       
       - name: Download images and export as tar
         if: env.release_found == 'true'
