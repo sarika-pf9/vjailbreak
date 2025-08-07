@@ -1,7 +1,7 @@
 name: Update Release Notes on Release Event
 
 env:
-  QCOW2_IMG: ${{ vars.REGISTRY }}/${{ vars.REPO }}/vjailbreak
+  QCOW2_IMG: ${{ vars.REGISTRY }}/${{ vars.REPO }}/vjailbreak-v2v-helper
 
 on:
   release:
@@ -58,7 +58,7 @@ jobs:
           RELEASE_TAG="${{ steps.get_tag.outputs.tag }}"
           QCOW_IMAGE_URL="docker://${{ env.QCOW2_IMG }}:${RELEASE_TAG}"
           
-          echo "Waiting for QCOW image to be available at $QCOW_IMAGE_URL"
+          echo "Waiting for QCOW image to be available at docker://quay.io/platform9/vjailbreak:v0.3.9"
 
           for i in $(seq 1 135); do
             if skopeo inspect "$QCOW_IMAGE_URL" &>/dev/null; then
