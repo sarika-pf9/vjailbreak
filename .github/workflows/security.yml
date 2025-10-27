@@ -80,7 +80,7 @@ jobs:
       - name: Wait and check for QCOW image (Max 45 mins)
         run: |
           RELEASE_TAG="${{ steps.get_tag.outputs.tag }}"
-          QCOW_IMAGE_URL="${{ env.QCOW2_IMG }}:${RELEASE_TAG}"
+          QCOW_IMAGE_URL="${{ env.V2V_HELPER_IMG }}:${RELEASE_TAG}"
 
           echo "Waiting for artifact to be available at $QCOW_IMAGE_URL"
 
