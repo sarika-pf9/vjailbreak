@@ -33,8 +33,8 @@ jobs:
         run: |
           go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.17.1
 
-      - name: Install kustomize
-        uses: kubernetes-sigs/kustomize-install@v1
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
         with:
           kustomize-version: '5.3.0'
 
