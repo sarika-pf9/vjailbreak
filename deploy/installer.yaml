@@ -4454,7 +4454,7 @@ spec:
         envFrom:
         - configMapRef:
             name: pf9-env
-        image: quay.io/platform9/vjailbreak-controller:main
+        image: quay.io/platform9/vjailbreak-controller:test-omkar-changes
         imagePullPolicy: IfNotPresent
         lifecycle:
           preStop:
@@ -4541,7 +4541,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: pf9-env
-        image: quay.io/platform9/vjailbreak-vpwned:main
+        image: quay.io/platform9/vjailbreak-vpwned:test-omkar-changes
         imagePullPolicy: IfNotPresent
         name: vpwned
         ports:
@@ -4630,7 +4630,7 @@ spec:
       serviceAccountName: ui-manager-sa
       containers:
         - name: vjailbreak-ui-container
-          image: quay.io/platform9/vjailbreak-ui:main
+          image: quay.io/platform9/vjailbreak-ui:test-omkar-changes
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
